@@ -4,8 +4,7 @@ using UnityEngine.Tilemaps;
 public class Board : MonoBehaviour
 {
     public Tilemap tilemap { get; private set; }
-    public Piece activePiece { get; private set; }
-
+    public Piece activePiece;
     public TetrominoData[] tetrominoes;
     public Vector2Int boardSize = new Vector2Int(10, 20);
     public Vector3Int spawnPosition = new Vector3Int(-1, 8, 0);
@@ -22,7 +21,6 @@ public class Board : MonoBehaviour
     private void Awake()
     {
         tilemap = GetComponentInChildren<Tilemap>();
-        activePiece = GetComponentInChildren<Piece>();
 
         for (int i = 0; i < tetrominoes.Length; i++)
         {
@@ -30,33 +28,8 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        SpawnPiece();
-    }
-
-    public void SpawnPiece()
-    {
-        int random = Random.Range(0, tetrominoes.Length);
-        TetrominoData data = tetrominoes[random];
-
-        activePiece.Initialize(this, spawnPosition, data);
-
-        if (IsValidPosition(activePiece, spawnPosition))
-        {
-            Set(activePiece);
-        }
-        else
-        {
-            GameOver();
-        }
-    }
-
-    public void GameOver()
-    {
+    public void ClearAllTiles() {
         tilemap.ClearAllTiles();
-
-        // Do anything else you want on game over here..
     }
 
     public void Set(Piece piece)
@@ -168,91 +141,9 @@ public class Board : MonoBehaviour
         }
     }
 
-    private void Update()
+    public void LockInBoard(Piece piece)
     {
-        Clear(activePiece);
-
-        // We use a timer to allow the player to make adjustments to the piece
-        // before it locks in place
-        activePiece.lockTime += Time.deltaTime;
-
-        // Handle rotation
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            activePiece.Rotate(-1);
-        }
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            activePiece.Rotate(1);
-        }
-
-        // Handle hard drop
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            HardDrop();
-        }
-
-        // Allow the player to hold movement keys but only after a move delay
-        // so it does not move too fast
-        if (Time.time > activePiece.moveTime)
-        {
-            HandleMoveInputs();
-        }
-
-        // Advance the piece to the next row every x seconds
-        if (Time.time > activePiece.stepTime)
-        {
-            Step();
-        }
-
-        Set(activePiece);
+        Set(piece);
+        ClearLines();
     }
-
-    private void HandleMoveInputs()
-    {
-        // Soft drop movement
-        if (Input.GetKey(KeyCode.S))
-        {
-            if (activePiece.Move(Vector2Int.down))
-            {
-                // Update the step time to prevent double movement
-                activePiece.stepTime = Time.time + activePiece.stepDelay;
-            }
-        }
-
-        // Left/right movement
-        if (Input.GetKey(KeyCode.A))
-        {
-            activePiece.Move(Vector2Int.left);
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            activePiece.Move(Vector2Int.right);
-        }
-    }
-
-    private void Step()
-    {
-        activePiece.stepTime = Time.time + activePiece.stepDelay;
-
-        // Step down to the next row
-        activePiece.Move(Vector2Int.down);
-
-        // Once the piece has been inactive for too long it becomes locked
-        if (activePiece.lockTime >= activePiece.lockDelay)
-        {
-            activePiece.LockInBoard();
-        }
-    }
-
-    private void HardDrop()
-    {
-        while (activePiece.Move(Vector2Int.down))
-        {
-            continue;
-        }
-
-        activePiece.LockInBoard();
-    }
-
 }

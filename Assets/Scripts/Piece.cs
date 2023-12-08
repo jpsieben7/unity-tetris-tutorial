@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Piece : MonoBehaviour
 {
-    public Board board { get; private set; }
     public TetrominoData data { get; private set; }
     public Vector3Int[] cells { get; private set; }
     public Vector3Int position { get; private set; }
@@ -17,10 +16,9 @@ public class Piece : MonoBehaviour
     public float moveTime;
     public float lockTime;
 
-    public void Initialize(Board board, Vector3Int position, TetrominoData data)
+    public void Initialize(Vector3Int position, TetrominoData data)
     {
         this.data = data;
-        this.board = board;
         this.position = position;
 
         rotationIndex = 0;
@@ -37,14 +35,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    public void LockInBoard()
-    {
-        board.Set(this);
-        board.ClearLines();
-        board.SpawnPiece();
-    }
-
-    public bool Move(Vector2Int translation)
+    public bool Move(Vector2Int translation, Board board)
     {
         Vector3Int newPosition = position;
         newPosition.x += translation.x;
@@ -63,7 +54,7 @@ public class Piece : MonoBehaviour
         return valid;
     }
 
-    public void Rotate(int direction)
+    public void Rotate(int direction, Board board)
     {
         // Store the current rotation in case the rotation fails
         // and we need to revert
@@ -74,7 +65,7 @@ public class Piece : MonoBehaviour
         ApplyRotationMatrix(direction);
 
         // Revert the rotation if the wall kick tests fail
-        if (!TestWallKicks(rotationIndex, direction))
+        if (!TestWallKicks(rotationIndex, direction, board))
         {
             rotationIndex = originalRotation;
             ApplyRotationMatrix(-direction);
@@ -113,7 +104,7 @@ public class Piece : MonoBehaviour
         }
     }
 
-    private bool TestWallKicks(int rotationIndex, int rotationDirection)
+    private bool TestWallKicks(int rotationIndex, int rotationDirection, Board board)
     {
         int wallKickIndex = GetWallKickIndex(rotationIndex, rotationDirection);
 
@@ -121,7 +112,7 @@ public class Piece : MonoBehaviour
         {
             Vector2Int translation = data.wallKicks[wallKickIndex, i];
 
-            if (Move(translation)) {
+            if (Move(translation, board)) {
                 return true;
             }
         }

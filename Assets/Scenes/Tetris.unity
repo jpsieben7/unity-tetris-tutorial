@@ -243,6 +243,52 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!1 &388460270
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 388460272}
+  - component: {fileID: 388460271}
+  m_Layer: 0
+  m_Name: TetrisGameController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &388460271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388460270}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9eefa4c952148149a4ff92ad4d1da81, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activePiece: {fileID: 1759447942}
+  board: {fileID: 1887623656}
+--- !u!4 &388460272
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 388460270}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.424293, y: 0.44518217, z: -1.1418116}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -716,7 +762,7 @@ GameObject:
   - component: {fileID: 1759447941}
   - component: {fileID: 1759447942}
   m_Layer: 0
-  m_Name: Piece
+  m_Name: ActivePiece
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -730,12 +776,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1759447940}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1887623654}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1759447942
 MonoBehaviour:
@@ -752,6 +798,9 @@ MonoBehaviour:
   stepDelay: 1
   moveDelay: 0.1
   lockDelay: 0.5
+  stepTime: 0
+  moveTime: 0
+  lockTime: 0
 --- !u!1 &1887623652
 GameObject:
   m_ObjectHideFlags: 0
@@ -796,7 +845,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 564011154}
-  - {fileID: 1759447941}
+  - {fileID: 2144466706}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1887623656
@@ -811,6 +860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d4fe201741a0f14c82a9ce960b9f5e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  activePiece: {fileID: 1759447942}
   tetrominoes:
   - tile: {fileID: 11400000, guid: aa44b5216a5f39e4881c5323564afe81, type: 2}
     tetromino: 0
@@ -839,7 +889,7 @@ GameObject:
   - component: {fileID: 1999733775}
   - component: {fileID: 1999733774}
   m_Layer: 0
-  m_Name: Grid (1)
+  m_Name: Preview Grid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -990,20 +1040,21 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2144466704}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1062971708}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1887623654}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 519420032}
-  - {fileID: 2144466706}
   - {fileID: 1999733775}
   - {fileID: 1887623654}
   - {fileID: 1253872413}
+  - {fileID: 1759447941}
+  - {fileID: 388460272}
