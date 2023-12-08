@@ -10,7 +10,8 @@ public class Board : MonoBehaviour
     public Vector2Int boardSize = new Vector2Int(10, 20);
     public Vector3Int spawnPosition = new Vector3Int(-1, 8, 0);
 
-    public RectInt Bounds {
+    public RectInt Bounds
+    {
         get
         {
             Vector2Int position = new Vector2Int(-boardSize.x / 2, -boardSize.y / 2);
@@ -23,7 +24,8 @@ public class Board : MonoBehaviour
         tilemap = GetComponentInChildren<Tilemap>();
         activePiece = GetComponentInChildren<Piece>();
 
-        for (int i = 0; i < tetrominoes.Length; i++) {
+        for (int i = 0; i < tetrominoes.Length; i++)
+        {
             tetrominoes[i].Initialize();
         }
     }
@@ -40,9 +42,12 @@ public class Board : MonoBehaviour
 
         activePiece.Initialize(this, spawnPosition, data);
 
-        if (IsValidPosition(activePiece, spawnPosition)) {
+        if (IsValidPosition(activePiece, spawnPosition))
+        {
             Set(activePiece);
-        } else {
+        }
+        else
+        {
             GameOver();
         }
     }
@@ -82,12 +87,14 @@ public class Board : MonoBehaviour
             Vector3Int tilePosition = piece.cells[i] + position;
 
             // An out of bounds tile is invalid
-            if (!bounds.Contains((Vector2Int)tilePosition)) {
+            if (!bounds.Contains((Vector2Int)tilePosition))
+            {
                 return false;
             }
 
             // A tile already occupies the position, thus invalid
-            if (tilemap.HasTile(tilePosition)) {
+            if (tilemap.HasTile(tilePosition))
+            {
                 return false;
             }
         }
@@ -105,9 +112,12 @@ public class Board : MonoBehaviour
         {
             // Only advance to the next row if the current is not cleared
             // because the tiles above will fall down when a row is cleared
-            if (IsLineFull(row)) {
+            if (IsLineFull(row))
+            {
                 LineClear(row);
-            } else {
+            }
+            else
+            {
                 row++;
             }
         }
@@ -122,7 +132,8 @@ public class Board : MonoBehaviour
             Vector3Int position = new Vector3Int(col, row, 0);
 
             // The line is not full if a tile is missing
-            if (!tilemap.HasTile(position)) {
+            if (!tilemap.HasTile(position))
+            {
                 return false;
             }
         }
@@ -155,6 +166,93 @@ public class Board : MonoBehaviour
 
             row++;
         }
+    }
+
+    private void Update()
+    {
+        Clear(activePiece);
+
+        // We use a timer to allow the player to make adjustments to the piece
+        // before it locks in place
+        activePiece.lockTime += Time.deltaTime;
+
+        // Handle rotation
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            activePiece.Rotate(-1);
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            activePiece.Rotate(1);
+        }
+
+        // Handle hard drop
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HardDrop();
+        }
+
+        // Allow the player to hold movement keys but only after a move delay
+        // so it does not move too fast
+        if (Time.time > activePiece.moveTime)
+        {
+            HandleMoveInputs();
+        }
+
+        // Advance the piece to the next row every x seconds
+        if (Time.time > activePiece.stepTime)
+        {
+            Step();
+        }
+
+        Set(activePiece);
+    }
+
+    private void HandleMoveInputs()
+    {
+        // Soft drop movement
+        if (Input.GetKey(KeyCode.S))
+        {
+            if (activePiece.Move(Vector2Int.down))
+            {
+                // Update the step time to prevent double movement
+                activePiece.stepTime = Time.time + activePiece.stepDelay;
+            }
+        }
+
+        // Left/right movement
+        if (Input.GetKey(KeyCode.A))
+        {
+            activePiece.Move(Vector2Int.left);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            activePiece.Move(Vector2Int.right);
+        }
+    }
+
+    private void Step()
+    {
+        activePiece.stepTime = Time.time + activePiece.stepDelay;
+
+        // Step down to the next row
+        activePiece.Move(Vector2Int.down);
+
+        // Once the piece has been inactive for too long it becomes locked
+        if (activePiece.lockTime >= activePiece.lockDelay)
+        {
+            activePiece.LockInBoard();
+        }
+    }
+
+    private void HardDrop()
+    {
+        while (activePiece.Move(Vector2Int.down))
+        {
+            continue;
+        }
+
+        activePiece.LockInBoard();
     }
 
 }
