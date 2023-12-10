@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class Piece : MonoBehaviour
@@ -70,6 +71,37 @@ public class Piece : MonoBehaviour
             rotationIndex = originalRotation;
             ApplyRotationMatrix(-direction);
         }
+    }
+
+    public BoundsInt GetBoundsInt(bool adjustedForPosition = true) {
+        if (adjustedForPosition) {
+            BoundsInt unadjusted = GetBoundsInt(false);
+            unadjusted.position += position;
+            return unadjusted;
+        } else {
+            int minX = 0;
+            int minY = 0;
+            int maxX = 0;
+            int maxY = 0;
+            if (cells.Length > 0) {
+                Vector3Int first = cells[0];
+                minX = first.x;
+                minY = first.y;
+                maxX = first.x;
+                maxY = first.y;
+            }
+            foreach (Vector3Int item in cells) {
+                if (item.x < minX) minX = item.x;
+                if (item.y < minY) minY = item.y;
+                if (item.x > maxX) maxX = item.x;
+                if (item.y > maxY) maxY = item.y;
+            }
+            return new BoundsInt(minX, minY, 0, maxX - minX, maxY - minY, 0);
+        }
+    }
+
+    public Vector3Int GetTilePosition(int index) {
+        return cells[index] + position;
     }
 
     private void ApplyRotationMatrix(int direction)

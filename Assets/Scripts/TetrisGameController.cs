@@ -1,16 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 
 public class TetrisGameController : MonoBehaviour
 {
+    public const int previewTileSpacing = 1;
     public Piece activePiece;
     public Board board;
+    public Board previewBoard;
+    public Piece piecePrefab;
+    public List<Piece> previewPieces = new List<Piece>();
+    
+    private const int previewTileOffset = previewTileSpacing + 1;
 
     // Start is called before the first frame update
     private void Start()
     {
         SpawnPiece();
+
+        //Spawn all the preview pieces
+        for (int i = 0; i < 4; ++i) {
+            Piece newPiece = Instantiate(piecePrefab);
+            TetrominoData data = GenerateRandomTetromino();
+            newPiece.Initialize(previewBoard.spawnPosition, data);
+
+            previewPieces.Add(newPiece);
+            previewBoard.Set(newPiece);
+        }
+
+        //Move them into place
+        int moveAmount = 0;
+        foreach(Piece item in previewPieces) {
+            item.Move(Vector2Int.down * moveAmount, previewBoard);
+            moveAmount = item.GetBoundsInt().yMin + previewTileOffset;
+        }
     }
 
     private void GameOver()
@@ -20,10 +44,14 @@ public class TetrisGameController : MonoBehaviour
         // Do anything else you want on game over here..
     }
 
+    private TetrominoData GenerateRandomTetromino() {
+        int random = Random.Range(0, board.tetrominoes.Length);
+        return board.tetrominoes[random];
+    }
+
     private void SpawnPiece()
     {
-        int random = Random.Range(0, board.tetrominoes.Length);
-        TetrominoData data = board.tetrominoes[random];
+        TetrominoData data = GenerateRandomTetromino();
 
         activePiece.Initialize(board.spawnPosition, data);
 
@@ -90,9 +118,7 @@ public class TetrisGameController : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
-    private void Update()
-    {
+    private void UpdateBoard() {
         board.Clear(activePiece);
 
         // We use a timer to allow the player to make adjustments to the piece
@@ -129,5 +155,11 @@ public class TetrisGameController : MonoBehaviour
         }
 
         board.Set(activePiece);
+    }
+
+    // Update is called once per frame
+    private void Update()
+    {
+        UpdateBoard();
     }
 }
