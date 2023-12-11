@@ -36,6 +36,7 @@ public class Piece : MonoBehaviour
         }
     }
 
+    //Only changes the internal position, does not update the board display
     public bool Move(Vector2Int translation, Board board)
     {
         Vector3Int newPosition = position;
@@ -51,6 +52,15 @@ public class Piece : MonoBehaviour
             moveTime = Time.time + moveDelay;
             lockTime = 0f; // reset
         }
+
+        return valid;
+    }
+
+    public bool MoveWithClearAndSet(Vector2Int translation, Board board)
+    {
+        board.Clear(this);
+        bool valid = Move(translation, board);
+        board.Set(this);
 
         return valid;
     }

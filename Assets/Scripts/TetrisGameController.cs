@@ -29,11 +29,18 @@ public class TetrisGameController : MonoBehaviour
             previewBoard.Set(newPiece);
         }
 
+        //Clear them all from the board beforehand so that clearing doesn't interfere with the newly set pieces
+        foreach(Piece item in previewPieces) { previewBoard.Clear(item); }
+
         //Move them into place
         int moveAmount = 0;
         foreach(Piece item in previewPieces) {
+            //Move the piece the current move amount then set the new move amount based on its new position
             item.Move(Vector2Int.down * moveAmount, previewBoard);
-            moveAmount = item.GetBoundsInt().yMin + previewTileOffset;
+            previewBoard.Set(item);
+            //We start at a high y-value, so we need to move it down the amount it has already moved plus an additional offset
+            //TODO: Working, but current problem is that we aren't considering tile height in the move amount
+            moveAmount = (previewBoard.spawnPosition.y - item.GetBoundsInt().yMin) + previewTileOffset;
         }
     }
 
