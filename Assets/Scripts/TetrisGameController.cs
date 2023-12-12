@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Numerics;
 using UnityEngine;
 
@@ -19,6 +20,10 @@ public class TetrisGameController : MonoBehaviour
     {
         SpawnPiece();
 
+        InitPreviewBoard();
+    }
+
+    private void InitPreviewBoard() {
         //Spawn all the preview pieces
         for (int i = 0; i < 4; ++i) {
             Piece newPiece = Instantiate(piecePrefab);
@@ -37,6 +42,9 @@ public class TetrisGameController : MonoBehaviour
         foreach(Piece item in previewPieces) {
             //Move the piece the current move amount then set the new move amount based on its new position
             item.Move(Vector2Int.down * moveAmount, previewBoard);
+            BoundsInt bounds = item.GetBoundsInt(false);
+            int height = bounds.yMax - bounds.yMin;
+            item.Move(Vector2Int.down * height, previewBoard);
             previewBoard.Set(item);
             //We start at a high y-value, so we need to move it down the amount it has already moved plus an additional offset
             //TODO: Working, but current problem is that we aren't considering tile height in the move amount
@@ -78,12 +86,16 @@ public class TetrisGameController : MonoBehaviour
         SpawnPiece();
     }
 
+    private bool MoveActivePiece(Vector2Int translation) {
+        return activePiece.Move(translation, board);
+    }
+
     private void Step()
     {
         activePiece.stepTime = Time.time + activePiece.stepDelay;
 
         // Step down to the next row
-        activePiece.Move(Vector2Int.down, board);
+        MoveActivePiece(Vector2Int.down);
 
         // Once the piece has been inactive for too long it becomes locked
         if (activePiece.lockTime >= activePiece.lockDelay)
@@ -94,7 +106,7 @@ public class TetrisGameController : MonoBehaviour
 
     private void HardDrop()
     {
-        while (activePiece.Move(Vector2Int.down, board))
+        while (MoveActivePiece(Vector2Int.down))
         {
             continue;
         }
@@ -107,7 +119,7 @@ public class TetrisGameController : MonoBehaviour
         // Soft drop movement
         if (Input.GetKey(KeyCode.S))
         {
-            if (activePiece.Move(Vector2Int.down, board))
+            if (MoveActivePiece(Vector2Int.down))
             {
                 // Update the step time to prevent double movement
                 activePiece.stepTime = Time.time + activePiece.stepDelay;
@@ -117,11 +129,11 @@ public class TetrisGameController : MonoBehaviour
         // Left/right movement
         if (Input.GetKey(KeyCode.A))
         {
-            activePiece.Move(Vector2Int.left, board);
+            MoveActivePiece(Vector2Int.left);
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            activePiece.Move(Vector2Int.right, board);
+            MoveActivePiece(Vector2Int.right);
         }
     }
 
